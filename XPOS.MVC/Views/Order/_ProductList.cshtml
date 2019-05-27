@@ -1,0 +1,64 @@
+﻿@model IEnumerable<XPOS.ViewModel.ProductViewModel>
+<div class="row">
+    <div class="col-sm-10">
+        <input type="text" id="txt-search" class="form-control" placeholder="Search..." />
+    </div>
+    <div class="col-sm-2">
+        <button type="button" id="btn-search" class="btn btn-success">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>
+<table class="table">
+    <tr>
+        <th>Select</th>
+        <th>
+            @Html.DisplayNameFor(model => model.Initial)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)/@Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Stock)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            <button type="button" class="btn btn-success" data-id="@item.Id" 
+                    data-dismiss="modal" title="Select" onclick="SelectProduct(this)">
+                <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            </button>
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Initial)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)<br />@Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Price)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Stock)
+        </td>
+    </tr>
+}
+</table>
+
+<script type="text/javascript">
+    $("#btn-search").click(function () {
+        $.ajax({
+            url: '@Url.Action("ProductList", "Order")',
+            type: 'get',
+            data: { search: $("#txt-search").val() },
+            success: function (result) {
+                $(".modal-body").html(result);
+            }
+        });
+    });
+</script>

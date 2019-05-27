@@ -1,0 +1,127 @@
+﻿@{
+    ViewBag.Title = "Point of Sales";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="panel panel-primary">
+    <!-- Default panel contents -->
+    <div class="panel-heading">
+        <input id="btn-new-order" type="button" value="New Order" class="btn btn-default btn-lg" />
+        <input id="btn-payment" type="button" value="Payment" class="btn btn-default btn-lg" />
+    </div>
+    <!-- Table -->
+    <div id="order-list">
+        <h3>Loading...</h3>
+    </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <p>One fine body&hellip;</p>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("OrderList", "Order")',
+                type: 'get',
+                success: function (result) {
+                    $("#order-list").html(result);
+                }
+            });
+        });
+
+        $("#btn-new-order").click(function () {
+            $.ajax({
+                url: '@Url.Action("ProductList", "Order")',
+                type: 'get',
+                success: function (result) {
+                    $(".modal-body").html(result);
+                    $(".modal-title").html("Select New Order");
+                    $(".modal").modal("show");
+                }
+            });
+        });
+
+        function SelectProduct(obj) {
+            $.ajax({
+                url: '@Url.Action("OrderByProduct", "Order")',
+                type: 'get',
+                data: { id: $(obj).attr("data-id") },
+                success: function (result) {
+                    $("#order-list").find("tbody").append(result);
+                    Recalculate();
+                }
+            });
+        }
+
+        function ChangeQuantity(obj) {
+            var tr = $(obj).closest("tr");
+            var qty = $(obj).val();
+            var price = $(tr).find("input[name=Price]").val();
+            var amount = $(tr).find("input[name=Amount]").val(qty * price);
+            Recalculate();
+        }
+
+        function RemoveOrder(obj) {
+            var tr = $(obj).closest("tr");
+            $(tr).remove();
+        }
+
+        function Recalculate() {
+            var totQty = 0;
+            var totAmount = 0;
+
+            $("#order-list").find("tbody").find("tr").each(function (item) {
+                totQty = parseFloat(totQty) + parseFloat($(this).find("input[name=Quantity]").val());
+                totAmount = parseFloat(totAmount) + parseFloat($(this).find("input[name=Amount]").val());
+            });
+            $("#Total-Quantity").val(totQty);
+            $("#Total-Amount").val(totAmount);
+        }
+        var data;
+        $("#btn-payment").click(function () {
+            var details = [];
+            $("#order-list").find("tbody").find("tr").each(function (item) {
+                var qty = parseFloat($(this).find("input[name=Quantity]").val());
+                if (qty > 0) {
+                    var detail = {
+                        ProductId: $(this).find("input[name=ProductId]").val(),
+                        ProductName: $(this).find("input[name=ProductName]").val(),
+                        Quantity: qty,
+                        Price: $(this).find("input[name=Price]").val()
+                    }
+                    details.push(detail);
+                }
+            });
+            data = {
+                Amount: $("#Total-Amount").val(),
+                Details: details
+            }
+            $.ajax({
+                url: '@Url.Action("Payment", "Order")',
+                type: 'post',
+                data: { model: data},
+                success: function (result) {
+                    $(".modal-body").html(result);
+                    $(".modal-title").html("Payment");
+                    $(".modal").modal("show");
+                }
+            });
+        });
+    </script>
+}

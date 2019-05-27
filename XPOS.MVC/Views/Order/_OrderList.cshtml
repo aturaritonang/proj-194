@@ -1,0 +1,38 @@
+﻿@model IEnumerable<XPOS.ViewModel.OrderDetailViewModel>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>Remove</th>
+        </tr>
+    </thead>
+    <tbody>
+        @*Nanti tambah baris disini*@
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">
+                Total
+            </th>
+            <th>
+                <input class="form-control text-box single-line" data-val="true" data-val-number="The field Price must be a number." data-val-required="The Price field is required." id="Total-Quantity" name="Total-Quantity" readonly="readonly" type="text">
+            </th>
+            <th>
+                <input class="form-control text-box single-line" data-val="true" data-val-number="The field Price must be a number." data-val-required="The Price field is required." id="Total-Amount" name="Total-Amount" readonly="readonly" type="text">
+            </th>
+            <th>Remove</th>
+        </tr>
+    </tfoot>
+</table>
